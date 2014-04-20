@@ -1,0 +1,35 @@
+<head>
+  <title>Smartfile!</title>
+</head>
+
+<body>
+  {{> smartfile }}
+</body>
+
+<template name="smartfile">
+  <h1>Hello World!</h1>
+  {{#if currentUser }}
+   <input type="file" />
+    {{#with sfData 'photo' }}
+  	  <p>last file uploaded but not saved in the user</p>
+  	  <div class="images">
+  	  	<img src="{{ src }}"/>
+  	  	name: {{ name }} - nameId: {{ nameId }}
+  	  </div>
+    {{/with}}
+  {{else}}
+    <p>Please sign in to save files</p>
+  {{/if}}
+
+  <div class="images" id="preview-images"></div>
+  {{> loginButtons }} 
+  <br/><button id="save">Save</button>
+
+  {{#if photo}}
+    <br/><br/>
+    <p>photo saved in user:</p>
+    <div class="images">
+    	<img src="{{ photo }}" />
+    </div>
+  {{/if}}
+</template>
