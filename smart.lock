@@ -7,8 +7,8 @@
     "packages": {
       "smartfile-api": {
         "git": "https://github.com/Goluis/meteor-smartfile.git",
-        "tag": "v0.1.3",
-        "commit": "febdfc56554be60f297ff071b14c0c3ff42c3139"
+        "tag": "v0.1.5",
+        "commit": "cf3ace7e2f89ec11c170544ec9a79aa13fc04732"
       }
     }
   }

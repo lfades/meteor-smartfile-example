@@ -66,9 +66,10 @@ Template.smartfile.events({
 Template.smartfile.helpers({
 	photo: function () {
 		if(Meteor.user()) {
-			var photo = Meteor.user().profile.photo;
+			var photo = Meteor.user().profile && Meteor.user().profile.photo;
 			// you can use in template {{ sfPath photo.nameId }} - is the same
-			return sf.resolvePublic(photo && photo.nameId);
+			if(photo)
+				return sf.resolvePublic(photo && photo.nameId);
 		}
 	}
 });

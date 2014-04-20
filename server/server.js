@@ -1,24 +1,10 @@
-Meteor.users.deny({
-	insert: function () { return true; },
-	update: function (userId, doc, fieldNames, otro) {
-		var photo = sf.getFiles('photo');
-		if(!photo)
-			return true;
+sf = new SmartFile();
 
-		var previousPhoto = doc.profile.photo;
-		if(previousPhoto) {
-			Meteor.defer(function () {
-				sf.rm(previousPhoto.nameId);
-			});
-		}
-
-		// we remove the local log file because it is now saved in the user
-		sf.cleanSfCollection(userId, 'photo');
-		return false;
-	},
-	remove: function () { return true; }
+Accounts.onCreateUser(function (options, user) {
+	// create an empty profile that we will use later to add the photo
+	user.profile = {};
+	return user;
 });
-
 
 // if you like use methods as me
 Meteor.methods({
@@ -42,18 +28,18 @@ Meteor.methods({
 		sf.cleanSfCollection(userId, 'photo');
 		Meteor.users.update(userId, {
 			'$set': {
-				'profile.photo': photo
+				profile: {
+					photo: photo
+				}
 			}
 		});
 	}
 });
 
-sf = new SmartFile();
-
 sf.configure({
-	key: "XXXXXXXXXXX",
-	password: "XXXXXXXXXXX",
-	basePath: "prueba"/*,
+	key: "XXXXXXXXXXXX",
+	password: "XXXXXXXXXXXX",
+	basePath: "test"/*,
 	fileNameId: function (fileName) {
 		// you can change the nameId here
 		// the filename has no extension
@@ -90,6 +76,27 @@ sf.fileControllers({
 		ext: ['jpg', 'png'] // IS OK
 	}
 	*/
+});
+
+Meteor.users.deny({
+	insert: function () { return true; },
+	update: function (userId, doc, fieldNames, otro) {
+		var photo = sf.getFiles('photo');
+		if(!photo)
+			return true;
+
+		var previousPhoto = doc.profile.photo;
+		if(previousPhoto) {
+			Meteor.defer(function () {
+				sf.rm(previousPhoto.nameId);
+			});
+		}
+
+		// we remove the local log file because it is now saved in the user
+		sf.cleanSfCollection(userId, 'photo');
+		return false;
+	},
+	remove: function () { return true; }
 });
 
 Meteor.publish('smartfile', function() {
