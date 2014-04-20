@@ -51,8 +51,8 @@ Meteor.methods({
 sf = new SmartFile();
 
 sf.configure({
-	key: "qvRxfIcUlCTHIF7Y5VjMJWDL7hzMSh",
-	password: "B5aCvdlEgstW7vnOnF85JKC3nDqkS1",
+	key: "XXXXXXXXXXX",
+	password: "XXXXXXXXXXX",
 	basePath: "prueba"/*,
 	fileNameId: function (fileName) {
 		// you can change the nameId here
