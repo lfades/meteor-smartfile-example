@@ -1,14 +1,34 @@
-sf = new SmartFile();
-
 Accounts.onCreateUser(function (options, user) {
 	// create an empty profile that we will use later to add the photo
 	user.profile = {};
 	return user;
 });
 
+Meteor.users.deny({
+	insert: function () { return true; },
+	update: function (userId, doc, fieldNames) {
+		var photo = sf.getFiles('photo');
+		if(!photo)
+			return true;
+
+		var previousPhoto = doc.profile.photo;
+		if(previousPhoto) {
+			Meteor.defer(function () {
+				sf.rm(previousPhoto.nameId);
+			});
+		}
+
+		// we remove the local log file because it is now saved in the user
+		sf.cleanSfCollection(userId, 'photo');
+		return false;
+	},
+	remove: function () { return true; }
+});
+
 // if you like use methods as me
 Meteor.methods({
 	editUserPhoto: function () {
+		// this method is not using but serves as a replacement update in users deny
 		var userId = this.userId;
 		if(!userId)
 			throw new Meteor.Error(401, 'no user');
@@ -33,74 +53,73 @@ Meteor.methods({
 				}
 			}
 		});
-	}
-});
+	},
+	editUserLikes: function (nameId) {
+		var userId = this.userId;
+		if(!userId)
+			throw new Meteor.Error(401, 'no user');
 
-sf.configure({
-	key: "XXXXXXXXXXXX",
-	password: "XXXXXXXXXXXX",
-	basePath: "test"/*,
-	fileNameId: function (fileName) {
-		// you can change the nameId here
-		// the filename has no extension
-		return fileName;
-	}*/
-});
+		var likes = sf.getFiles('likes');
+		if(!likes)
+			throw new Meteor.Error(401, 'no files to upload');
 
-sf.allow = function (options) {
-	// you can use this.userId
-	return true;
-};
+		if(nameId)
+			var only = _.findWhere(likes, {'nameId': nameId})
 
-sf.onUpload = function (result, options) {
-	//result is the smartfile api JSON response
-	console.log("File uploaded to " + result[0].path);
-};
+		var previousLikes = Meteor.user().profile.likes;
+		if(previousLikes) {
+			if(previousLikes.length === 3)
+				throw new Meteor.Error(401, 'already have the maximum number of files, delete some and upload new');
+			if(!nameId && (previousLikes.length + likes.length) > 3)
+				throw new Meteor.Error(401, 'have too many files to upload, delete some');
 
-sf.onUploadFail = function (error, options) {
-	console.log("SmartFile returned error", error.statusCode, error.detail);
-};
+			var push = nameId ? only: {'$each': likes};
+			if(!push)
+				throw new Meteor.Error(401, 'is not found a file with that name');
 
-sf.fileControllers({
-	photo: {
-		ext: ['jpg', 'png'],
-		path: '', // optional, path of storage of the upload relative to basePath
-		size: 300000, // 300 Kb - default is 2 Mb
-		allow: function (options) {
-			// you can use this.userId
-			return true;
-		}
-	}
-	/* 
-	photo: {
-		ext: ['jpg', 'png'] // IS OK
-	}
-	*/
-});
-
-Meteor.users.deny({
-	insert: function () { return true; },
-	update: function (userId, doc, fieldNames, otro) {
-		var photo = sf.getFiles('photo');
-		if(!photo)
-			return true;
-
-		var previousPhoto = doc.profile.photo;
-		if(previousPhoto) {
-			Meteor.defer(function () {
-				sf.rm(previousPhoto.nameId);
+			
+			Meteor.users.update(userId, {
+				'$push': {
+					'profile.likes': push
+				}
+			});
+		} else {
+			var set = nameId ? [only]: likes;
+			Meteor.users.update(userId, {
+				'$set': {
+					'profile.likes': set
+				}
 			});
 		}
 
-		// we remove the local log file because it is now saved in the user
-		sf.cleanSfCollection(userId, 'photo');
-		return false;
+		sf.cleanSfCollection(userId, 'likes', only);
 	},
-	remove: function () { return true; }
-});
+	deleteLikeFile: function (nameId, controller) {
+		var userId = this.userId;
+		if(!userId)
+			throw new Meteor.Error(401, 'no user');
 
-Meteor.publish('smartfile', function() {
-	if(this.userId)
-		return sf.collection.find({'user': this.userId});
-	return [];
+		if(!nameId)
+			throw new Meteor.Error(401, 'enter the nameId');
+
+		var likes = controller ? sf.getFiles('likes'): Meteor.user().profile.likes;
+		if(!likes)
+			throw new Meteor.Error(401, 'no files to remove');
+
+		if(likes) {
+			if(controller) {
+				sf.cleanSfCollection(userId, 'likes', {'nameId': nameId});
+			} else {
+				Meteor.users.update(userId, {
+					'$pull': {
+						'profile.likes': {'nameId': nameId}
+					}
+				});
+			}
+			
+			Meteor.defer(function () {
+				sf.rm(nameId);
+			});
+		}
+	}
 });

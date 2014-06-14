@@ -1,35 +1,121 @@
 <head>
-  <title>Smartfile!</title>
+	<title>Smartfile!</title>
 </head>
 
 <body>
-  {{> smartfile }}
+	{{> smartfile }}
 </body>
 
 <template name="smartfile">
-  <h1>Hello World!</h1>
-  {{#if currentUser }}
-   <input type="file" />
-    {{#with sfData 'photo' }}
-  	  <p>last file uploaded but not saved in the user</p>
-  	  <div class="images">
-  	  	<img src="{{ src }}"/>
-  	  	name: {{ name }} - nameId: {{ nameId }}
-  	  </div>
-    {{/with}}
-  {{else}}
-    <p>Please sign in to save files</p>
-  {{/if}}
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<span class="navbar-brand">Smartfile Api</span>
+			</div>
+			<div class="navbar-collapse collapse">
+				<div class="nav navbar-right">
+					<span class="navbar-brand">{{> loginButtons }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
 
-  <div class="images" id="preview-images"></div>
-  {{> loginButtons }} 
-  <br/><button id="save">Save</button>
+	<div class="jumbotron">
+		<div class="container">
+			<h1>Meteor Smartfile</h1>
+			<p>simple integration of <a href="https://github.com/Goluis/meteor-smartfile">smartfile-api</a> package with meteor.</p>
+			<p>demo project in <a href="https://github.com/Goluis/meteor-smartfile-example">Github</a></p>
+			<p>I recommend you open the console to see logs</p>
+			<p>Configure smartfile in the server and the client before proceeding</p>
+		</div>
+	</div>
 
-  {{#if photo}}
-    <br/><br/>
-    <p>photo saved in user:</p>
-    <div class="images">
-    	<img src="{{ photo }}" />
-    </div>
-  {{/if}}
+	<div class="container">
+		{{#if currentUser }}
+			<!-- Example row of columns -->
+			<div class="page-header">
+				<h1>Simple Upload!</h1>
+			</div>
+			<div>
+				<input type="file" id="files"/>
+				{{#with sfData 'photo' }}
+					<div class="images">
+						<p>name: {{ name }}</p>
+						<p>nameId: {{ nameId }}</p>
+						<img src="{{ src }}" class="img-thumbnail"/>
+						<p>last file uploaded but not saved in the user</p>
+					</div>
+				{{/with}}
+
+				<div class="images" id="preview-images"></div>
+				 
+				<br/><button type="button" class="btn btn-primary btn-lg" id="save">Save</button>
+
+				{{#if photo }}
+					<br/><br/>
+					<p>photo saved in user:</p>
+					<img src="{{ photo }}" class="img-thumbnail"/>
+				{{/if}}
+			</div>
+
+			<h1>Multiple upload</h1>
+			<div>
+				<input type="file" id="filesMultiple"/>
+				<div class="images" id="preview-images-multiple"></div>
+
+				<div class="page-header">
+					<h1>Files waiting</h1>
+				</div>
+
+				<div class="row">
+					{{#each sfData 'likes' }}
+						{{> likesFiles }}
+					{{/each}}
+				</div>
+
+				<br/><button type="button" class="btn btn-primary btn-lg" id="saveAllMultiple">Save All</button>
+
+				{{#if likes }}
+
+					<div class="page-header">
+						<h1>Images in the user likes (up to 3)</h1>
+					</div>
+					
+					<div class="row">
+						{{#each likes }}
+							{{> likesFilesInUser }}
+						{{/each}}
+					</div>
+
+				{{/if}}
+			</div>
+
+			<hr>
+
+			<footer>
+				<p>&copy; Company 2014</p>
+			</footer>
+		{{ else }}
+			<h1 class="text-primary">Please sign in to save files</h1>
+		{{/if}}
+	</div> <!-- /container -->
+</template>
+
+<template name="likesFiles">
+	<div class="col-sm-4">
+		<p>name: {{ name }}</p>
+		<p>nameId: {{ nameId }}</p>
+		<img src="{{ src }}" class="img-thumbnail"/>
+
+		<button class="btn btn-primary saveLike">Save</button>
+		<button class="btn btn-primary deleteFile">Delete</button>
+	</div>
+</template>
+
+<template name="likesFilesInUser">
+	<div class="col-sm-4">
+		{{ name }}
+		<img src="{{ src }}" class="img-thumbnail"/>
+		<button type="button" class="btn btn-primary btn-lg btn-block deleteFile">Delete</button>
+	</div>
 </template>

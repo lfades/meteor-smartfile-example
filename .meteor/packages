@@ -4,6 +4,7 @@
 # but you can also edit it by hand.
 
 standard-app-packages
-accounts-ui
 accounts-password
+accounts-ui-bootstrap-3
+bootstrap-3
 smartfile-api
