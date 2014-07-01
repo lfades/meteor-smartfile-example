@@ -14,13 +14,13 @@
       },
       "bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
-        "tag": "v3.1.1-1",
-        "commit": "63dd38968828bb8963636df93e9a1c45e2dfe67e"
+        "tag": "v3.2.0-1",
+        "commit": "17a63902fc6cf1096c5289d963c66cf28b474727"
       },
       "smartfile-api": {
         "git": "https://github.com/Goluis/meteor-smartfile.git",
-        "tag": "v0.1.6",
-        "commit": "6bfea4b1772c7b1b8fe8c27f9fb0c5d74c619ce0"
+        "tag": "v0.2.0",
+        "commit": "bbb8996fae70b3b37a45af80e7816345205cf678"
       }
     }
   }

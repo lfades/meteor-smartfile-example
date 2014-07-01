@@ -26,30 +26,32 @@
 			<p>simple integration of <a href="https://github.com/Goluis/meteor-smartfile">smartfile-api</a> package with meteor.</p>
 			<p>demo project in <a href="https://github.com/Goluis/meteor-smartfile-example">Github</a></p>
 			<p>I recommend you open the console to see logs</p>
-			<p>Configure smartfile in the server and the client before proceeding</p>
 		</div>
 	</div>
 
 	<div class="container">
 		{{#if currentUser }}
-			<!-- Example row of columns -->
 			<div class="page-header">
 				<h1>Simple Upload!</h1>
 			</div>
 			<div>
 				<input type="file" id="files"/>
 				{{#with sfData 'photo' }}
-					<div class="images">
+				<div class="row">
+					<div class="images col-sm-4">
 						<p>name: {{ name }}</p>
 						<p>nameId: {{ nameId }}</p>
-						<img src="{{ src }}" class="img-thumbnail"/>
 						<p>last file uploaded but not saved in the user</p>
+						<img src="{{ src }}" class="img-thumbnail"/>
+						<button type="button" class="btn btn-primary btn-block" id="save">Save</button>
+						<button type="button" class="btn btn-danger btn-block" id="delete">Delete</button>
 					</div>
+				</div>
 				{{/with}}
 
 				<div class="images" id="preview-images"></div>
 				 
-				<br/><button type="button" class="btn btn-primary btn-lg" id="save">Save</button>
+				<br/>
 
 				{{#if photo }}
 					<br/><br/>
@@ -59,7 +61,6 @@
 			</div>
 
 			<h1>Multiple upload</h1>
-			<div>
 				<input type="file" id="filesMultiple"/>
 				<div class="images" id="preview-images-multiple"></div>
 
@@ -76,7 +77,6 @@
 				<br/><button type="button" class="btn btn-primary btn-lg" id="saveAllMultiple">Save All</button>
 
 				{{#if likes }}
-
 					<div class="page-header">
 						<h1>Images in the user likes (up to 3)</h1>
 					</div>
@@ -86,9 +86,7 @@
 							{{> likesFilesInUser }}
 						{{/each}}
 					</div>
-
 				{{/if}}
-			</div>
 
 			<hr>
 

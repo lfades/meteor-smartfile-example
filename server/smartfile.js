@@ -3,7 +3,7 @@ sf = new SmartFile();
 sf.configure({
 	key: "XXXXXXXXXXXX",
 	password: "XXXXXXXXXXXX",
-	basePath: "test"/*,
+	basePath: "prueba"/*,
 	fileNameId: function (fileName) {
 		// you can change the nameId here
 		// the filename has no extension
@@ -28,8 +28,8 @@ sf.onUploadFail = function (error, options) {
 sf.fileControllers({
 	photo: {
 		ext: ['jpg', 'png'],
-		path: '', // optional, path of storage of the upload relative to basePath
-		size: 300000, // 300 Kb - default is 2 Mb
+		path: '', // optional, path of storage of the upload relative to basePath, may be a function
+		size: 3000000, // 300 Kb - default is 2 Mb
 		allow: function (options) {
 			// you can use this.userId
 			return true;
@@ -38,7 +38,8 @@ sf.fileControllers({
 	likes: {
 		ext: ['jpg', 'png'],
 		size: 300000,
-		multiple: 3
+		multiple: 3,
+		share: false
 	},
 	/*
 	multiple: true // IS OK

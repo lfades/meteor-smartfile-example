@@ -1,5 +1,5 @@
 sf = new SmartFile({
-	publicRootUrl: "https://file.ac/XXXXXXXXXXXX/"
+	publicRootUrl: "https://file.ac/XXXXXXXXXXXX"
 });
 
 // I recommend you open the console to see logs
@@ -20,13 +20,12 @@ Template.smartfile.events({
 							$('#preview-images').html('');
 							return;
 						}
-						console.log("File uploaded, the path is:" + sf.resolvePublic(res.nameId));
+						console.log("File uploaded, the path is:" + sf.link(res));
 					});
 				}
 			});
 		}
-		/* the above is the same as this 
-
+		/* the above is the same as this
 			// sf.preview only works with images
 			sf.preview(file, function(data) {
 				if(data)
@@ -38,11 +37,11 @@ Template.smartfile.events({
 					console.log("error uploading the file", error);
 					return;
 				}
-				console.log("File uploaded, the path is:" + sf.resolvePublic(res.nameId));
+				console.log("File uploaded, the path is:" + sf.link(res));
 			});
 		*/
 	},
-	'click #save': function (e) {
+	'click #save': function () {
 		var userId = Meteor.userId();
 		if(userId) {
 			var file = sf.getFiles('photo');
@@ -62,6 +61,9 @@ Template.smartfile.events({
 			*/
 		}
 	},
+	'click #delete': function () {
+		sf.remove('photo');
+	},
 	'change #filesMultiple': function (e) {
 		var file = e.target.files[0];
 		if(file) {
@@ -76,7 +78,7 @@ Template.smartfile.events({
 							$('#preview-images-multiple').html('');
 							return;
 						}
-						console.log("File uploaded, the path is:" + sf.resolvePublic(res.nameId));
+						console.log("File uploaded, the path is:" + sf.link(res));
 					});
 				}
 			});
@@ -100,17 +102,17 @@ Template.smartfile.helpers({
 			var photo = user.profile && user.profile.photo;
 			// you can use in template {{ sfPath photo.nameId }} - is the same
 			if(photo)
-				return sf.resolvePublic(photo && photo.nameId);
+				return sf.link(photo);
 		}
 	},
 	likes: function () {
 		var user = Meteor.user();
 		if(user) {
 			var likes = user.profile && user.profile.likes;
-			// you can use in template {{ sfPath photo.nameId }} - is the same
+
 			if(likes) {
 				return _.map(likes, function (like) {
-					like.src = sf.resolvePublic(like.nameId);
+					like.src = sf.link(like);
 					return like;
 				});
 			}
@@ -125,16 +127,13 @@ Template.likesFiles.events({
 		});
 	},
 	'click .deleteFile': function () {
-		// true is sent to indicate that it will remove from smartfile and not from the user
-		Meteor.call('deleteLikeFile', this.nameId, true, function (error) {
-			console.log(error || 'file removed');
-		});
+		sf.remove('likes', this.nameId);
 	}
 });
 
 Template.likesFilesInUser.events({
 	'click .deleteFile': function () {
-		Meteor.call('deleteLikeFile', this.nameId, function (error) {
+		Meteor.call('deleteLikeFile', this, function (error) {
 			console.log(error || 'file removed from you profile');
 		});
 	}

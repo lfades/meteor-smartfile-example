@@ -14,7 +14,7 @@ Meteor.users.deny({
 		var previousPhoto = doc.profile.photo;
 		if(previousPhoto) {
 			Meteor.defer(function () {
-				sf.rm(previousPhoto.nameId);
+				sf.rm(previousPhoto);
 			});
 		}
 
@@ -40,7 +40,7 @@ Meteor.methods({
 		var previousPhoto = Meteor.user().profile.photo;
 		if(previousPhoto) {
 			Meteor.defer(function () {
-				sf.rm(previousPhoto.nameId);
+				sf.rm(previousPhoto);
 			});
 		}
 
@@ -77,7 +77,6 @@ Meteor.methods({
 			if(!push)
 				throw new Meteor.Error(401, 'is not found a file with that name');
 
-			
 			Meteor.users.update(userId, {
 				'$push': {
 					'profile.likes': push
@@ -94,31 +93,28 @@ Meteor.methods({
 
 		sf.cleanSfCollection(userId, 'likes', only);
 	},
-	deleteLikeFile: function (nameId, controller) {
+	deleteLikeFile: function (file) {
 		var userId = this.userId;
 		if(!userId)
 			throw new Meteor.Error(401, 'no user');
 
+		var nameId = file.nameId;
 		if(!nameId)
 			throw new Meteor.Error(401, 'enter the nameId');
 
-		var likes = controller ? sf.getFiles('likes'): Meteor.user().profile.likes;
+		var likes = Meteor.user().profile.likes;
 		if(!likes)
 			throw new Meteor.Error(401, 'no files to remove');
 
 		if(likes) {
-			if(controller) {
-				sf.cleanSfCollection(userId, 'likes', {'nameId': nameId});
-			} else {
-				Meteor.users.update(userId, {
-					'$pull': {
-						'profile.likes': {'nameId': nameId}
-					}
-				});
-			}
-			
+			Meteor.users.update(userId, {
+				'$pull': {
+					'profile.likes': {'nameId': nameId}
+				}
+			});
+			// the only thing required on file is: nameId
 			Meteor.defer(function () {
-				sf.rm(nameId);
+				sf.rm(file);
 			});
 		}
 	}
